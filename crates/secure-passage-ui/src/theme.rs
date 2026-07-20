@@ -22,12 +22,12 @@ pub fn apply(ctx: &egui::Context) {
     ctx.set_style_of(Theme::Dark, style);
     ctx.set_theme(Theme::Dark);
 
+    // Prefer egui's built-in monospace faces globally (IBM Plex–like look).
+    // Do not insert a literal "monospace" name — that has no font data and panics.
     let mut fonts = egui::FontDefinitions::default();
-    fonts
-        .families
-        .entry(FontFamily::Proportional)
-        .or_default()
-        .insert(0, "monospace".to_owned());
+    if let Some(mono) = fonts.families.get(&FontFamily::Monospace).cloned() {
+        fonts.families.insert(FontFamily::Proportional, mono);
+    }
     ctx.set_fonts(fonts);
 }
 
