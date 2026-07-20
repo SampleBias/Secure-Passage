@@ -34,7 +34,6 @@ Traffic is Sphinx-encrypted and routed through mix nodes for network-level priva
 
 | Feature | Description |
 |---|---|
-| **VPN check** | Optional startup dialog with a best-effort public IP / org heuristic |
 | **Nym connect** | Embedded mixnet client with persistent identity |
 | **Secure Chat** | Host / join encrypted messaging over `MixnetStream` |
 | **File Sharing** | Chunked encrypted transfer, optional password, auto-shutdown |
@@ -77,8 +76,6 @@ Traffic is Sphinx-encrypted and routed through mix nodes for network-level priva
 - Network access to the **Nym mainnet** mixnet
 - ~disk space for a debug build of `nym-sdk` and dependencies (release builds are smaller)
 
-Optional: a VPN in addition to the mixnet for an extra hop of protection.
-
 ---
 
 ## Install & run
@@ -116,9 +113,8 @@ Your Nym address stays stable across restarts until you delete that directory.
 ### Startup flow
 
 1. Launch the app  
-2. **VPN Check** (optional) — Check / Skip / Continue  
-3. **Connect to Nym** — wait for gateway bootstrap (can take a minute)  
-4. **Enter App**
+2. **Connect to Nym** — wait for gateway bootstrap (can take a minute)  
+3. **Enter App**
 
 ### Secure Chat
 
@@ -156,7 +152,7 @@ Share address and key through a **separate secure channel**.
 ```text
 ┌─────────────────────────────────────────────────────────┐
 │  secure-passage-ui (egui)                               │
-│    VPN / Nym dialogs · chat · files · logs · status     │
+│    Nym connect · chat · files · logs · status           │
 └───────────────────────────┬─────────────────────────────┘
                             │ commands / events
 ┌───────────────────────────▼─────────────────────────────┐
@@ -190,7 +186,6 @@ Primary dependency: [`nym-sdk`](https://docs.rs/nym-sdk/) — see also [Nym Rust
 
 - Session keys are only as safe as the channel you use to share them  
 - Streams need live peers; gateways help with messaging but streams are interactive  
-- VPN detection is heuristic, not authoritative  
 - Endpoint compromise (malware, screen capture) defeats client-side encryption  
 - Not compatible with sessions from the Python/Tor app  
 

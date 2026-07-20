@@ -1,32 +1,26 @@
 use crate::theme;
 use crate::views::chat::{self, ChatAction, ChatViewState};
-use crate::views::dialogs::{
-    self, NymConnectAction, NymConnectState, VpnAction, VpnDialogState,
-};
+use crate::views::dialogs::{self, NymConnectAction, NymConnectState};
 use crate::views::files::{self, FilesAction, FilesViewState};
 use crate::views::logs::LogsState;
 use crate::views::nav::{self, Page};
 use crate::views::status::{self, StatusAction, StatusBarState};
 use crate::views::{banner, logs};
-use secure_passage_core::{
-    check_vpn_status, AppEvent, NymCommand, NymHandle, SessionKey, TransferKind,
-};
+use secure_passage_core::{AppEvent, NymCommand, NymHandle, SessionKey, TransferKind};
 use tokio::sync::mpsc;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Screen {
-    VpnCheck,
     NymConnect,
     Main,
 }
 
 pub struct SecurePassageApp {
     screen: Screen,
-    runtime: tokio::runtime::Runtime,
-    event_tx: mpsc::UnboundedSender<AppEvent>,
+    /// Kept alive so the multi-thread Tokio runtime outlives Nym background tasks.
+    _runtime: tokio::runtime::Runtime,
     event_rx: mpsc::UnboundedReceiver<AppEvent>,
     nym: NymHandle,
-    vpn: VpnDialogState,
     nym_connect: NymConnectState,
     page: Page,
     status: StatusBarState,
@@ -53,12 +47,10 @@ pub fn create(cc: &eframe::CreationContext<'_>) -> SecurePassageApp {
     };
 
     SecurePassageApp {
-        screen: Screen::VpnCheck,
-        runtime,
-        event_tx,
+        screen: Screen::NymConnect,
+        _runtime: runtime,
         event_rx,
         nym,
-        vpn: VpnDialogState::default(),
         nym_connect: NymConnectState::default(),
         page: Page::Files,
         status: StatusBarState::default(),
@@ -83,17 +75,6 @@ impl SecurePassageApp {
     fn handle_event(&mut self, ctx: &egui::Context, ev: AppEvent) {
         match ev {
             AppEvent::Log { level, message } => self.logs.push(&level, &message),
-            AppEvent::VpnStatus { detected, detail } => {
-                self.vpn.checking = false;
-                self.vpn.detected = Some(detected);
-                self.vpn.detail = detail;
-                self.status.vpn_ok = detected;
-                self.status.vpn_label = if detected {
-                    "VPN: Likely".into()
-                } else {
-                    "VPN: Not detected".into()
-                };
-            }
             AppEvent::ConnectProgress { percent, message } => {
                 self.nym_connect.connecting = percent < 100;
                 self.nym_connect.percent = percent;
@@ -245,25 +226,6 @@ impl eframe::App for SecurePassageApp {
         let ctx = ui.ctx().clone();
 
         match self.screen {
-            Screen::VpnCheck => {
-                egui::CentralPanel::default()
-                    .frame(egui::Frame::NONE.fill(theme::BG))
-                    .show(ui, |ui| match dialogs::show_vpn(ui, &mut self.vpn) {
-                        VpnAction::Check => {
-                            self.vpn.checking = true;
-                            let tx = self.event_tx.clone();
-                            self.runtime.spawn(async move {
-                                let (detected, detail) = check_vpn_status().await;
-                                let _ = tx.send(AppEvent::VpnStatus { detected, detail });
-                            });
-                        }
-                        VpnAction::Continue => self.screen = Screen::NymConnect,
-                        VpnAction::Quit => {
-                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-                        }
-                        VpnAction::None => {}
-                    });
-            }
             Screen::NymConnect => {
                 egui::CentralPanel::default()
                     .frame(egui::Frame::NONE.fill(theme::BG))
@@ -295,9 +257,6 @@ impl eframe::App for SecurePassageApp {
                             self.nym.send(NymCommand::Kill);
                             self.screen = Screen::NymConnect;
                         }
-                        StatusAction::VpnLink => {
-                            ctx.open_url(egui::OpenUrl::new_tab("https://mullvad.net/"));
-                        }
                         StatusAction::None => {}
                     });
 
@@ -312,14 +271,14 @@ impl eframe::App for SecurePassageApp {
                             Page::Files => handle_files(self, ui, &ctx),
                             Page::Chat => handle_chat(self, ui, &ctx),
                             Page::Hosting => {
-                                ui.heading("Website Hosting");
+                                ui.heading("Website Hosting (in dev)");
                                 ui.label(
                                     egui::RichText::new("Coming soon — deferred past MVP.")
                                         .color(theme::MUTED),
                                 );
                             }
                             Page::Browser => {
-                                ui.heading("Mixnet Browser");
+                                ui.heading("Nym Browser (in dev)");
                                 ui.label(
                                     egui::RichText::new(
                                         "Coming soon — SOCKS / IPR browsing in a later phase.",

@@ -22,10 +22,6 @@ pub enum AppEvent {
         level: String,
         message: String,
     },
-    VpnStatus {
-        detected: bool,
-        detail: String,
-    },
     ConnectProgress {
         percent: u8,
         message: String,

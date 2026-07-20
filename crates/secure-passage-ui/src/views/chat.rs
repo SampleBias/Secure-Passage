@@ -44,16 +44,10 @@ pub fn show(ui: &mut egui::Ui, state: &mut ChatViewState, mixnet_connected: bool
     }
 
     ui.horizontal(|ui| {
-        if ui
-            .selectable_label(state.mode_host, "Host chat")
-            .clicked()
-        {
+        if theme::mode_tab(ui, state.mode_host, "Host chat").clicked() {
             state.mode_host = true;
         }
-        if ui
-            .selectable_label(!state.mode_host, "Join chat")
-            .clicked()
-        {
+        if theme::mode_tab(ui, !state.mode_host, "Join chat").clicked() {
             state.mode_host = false;
         }
     });

@@ -31,7 +31,6 @@ hex = "0.4"
 dirs = "6"
 futures = "0.3"
 bytes = "1"
-reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 qrcode = "0.14"
 image = { version = "0.25", default-features = false, features = ["png"] }
 eframe = { version = "0.35", default-features = true, features = ["default_fonts", "glow"] }

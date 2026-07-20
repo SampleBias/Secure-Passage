@@ -3,16 +3,12 @@ use egui::RichText;
 
 pub struct StatusBarState {
     pub mixnet: String,
-    pub vpn_label: String,
-    pub vpn_ok: bool,
 }
 
 impl Default for StatusBarState {
     fn default() -> Self {
         Self {
             mixnet: "Nym not connected".into(),
-            vpn_label: "VPN: Unknown".into(),
-            vpn_ok: false,
         }
     }
 }
@@ -21,7 +17,6 @@ pub enum StatusAction {
     None,
     Logs,
     Kill,
-    VpnLink,
 }
 
 pub fn show(ui: &mut egui::Ui, state: &StatusBarState) -> StatusAction {
@@ -35,15 +30,6 @@ pub fn show(ui: &mut egui::Ui, state: &StatusBarState) -> StatusAction {
             if theme::primary_button(ui, "Logs").clicked() {
                 action = StatusAction::Logs;
             }
-            if theme::success_button(ui, "Need a VPN that will protect you?").clicked() {
-                action = StatusAction::VpnLink;
-            }
-            let vpn_color = if state.vpn_ok {
-                theme::SUCCESS
-            } else {
-                theme::ORANGE
-            };
-            ui.label(RichText::new(&state.vpn_label).color(vpn_color).size(12.0));
         });
     });
     action

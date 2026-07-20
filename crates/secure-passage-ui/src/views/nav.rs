@@ -19,11 +19,11 @@ pub fn show(ui: &mut egui::Ui, current: &mut Page) {
                 ui.add_space(ui.available_width() * 0.05);
                 nav_btn(ui, current, Page::Files, "File Sharing", true);
                 ui.add_space(20.0);
-                nav_btn(ui, current, Page::Hosting, "Website Hosting", false);
+                nav_btn(ui, current, Page::Hosting, "Website Hosting (in dev)", false);
                 ui.add_space(20.0);
                 nav_btn(ui, current, Page::Chat, "Secure Chat", true);
                 ui.add_space(20.0);
-                nav_btn(ui, current, Page::Browser, "Mixnet Browser", false);
+                nav_btn(ui, current, Page::Browser, "Nym Browser (in dev)", false);
                 ui.add_space(ui.available_width() * 0.05);
             });
         });
@@ -31,16 +31,22 @@ pub fn show(ui: &mut egui::Ui, current: &mut Page) {
 
 fn nav_btn(ui: &mut egui::Ui, current: &mut Page, page: Page, label: &str, enabled: bool) {
     let selected = *current == page;
-    let fill = if selected {
-        theme::PRIMARY
+    let id = ui.next_auto_id();
+    let hovered = ui
+        .ctx()
+        .read_response(id)
+        .is_some_and(|r| r.hovered() || r.is_pointer_button_down_on());
+
+    let (fill, text) = if selected {
+        (theme::PRIMARY, theme::ON_PRIMARY)
+    } else if enabled && hovered {
+        (theme::PRIMARY_HOVER, theme::ON_PRIMARY)
+    } else if enabled {
+        (theme::BG, theme::TEXT)
     } else {
-        theme::BG
+        (theme::BG, theme::MUTED)
     };
-    let text = if enabled {
-        theme::TEXT
-    } else {
-        theme::MUTED
-    };
+
     let resp = ui.add_enabled(
         enabled,
         egui::Button::new(RichText::new(label).color(text).strong().size(14.0))

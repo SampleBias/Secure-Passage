@@ -55,13 +55,10 @@ pub fn show(ui: &mut egui::Ui, state: &mut FilesViewState, mixnet_connected: boo
     }
 
     ui.horizontal(|ui| {
-        if ui.selectable_label(state.mode_host, "Send / Host").clicked() {
+        if theme::mode_tab(ui, state.mode_host, "Send / Host").clicked() {
             state.mode_host = true;
         }
-        if ui
-            .selectable_label(!state.mode_host, "Receive")
-            .clicked()
-        {
+        if theme::mode_tab(ui, !state.mode_host, "Receive").clicked() {
             state.mode_host = false;
         }
     });
@@ -129,7 +126,15 @@ pub fn show(ui: &mut egui::Ui, state: &mut FilesViewState, mixnet_connected: boo
             if !state.hosting && !state.transferring {
                 let can = state.selected_path.is_some();
                 if ui
-                    .add_enabled(can, egui::Button::new("Start Sharing").fill(theme::PRIMARY))
+                    .add_enabled(
+                        can,
+                        egui::Button::new(
+                            egui::RichText::new("Start Sharing")
+                                .color(theme::ON_PRIMARY)
+                                .strong(),
+                        )
+                        .fill(theme::primary_fill(ui)),
+                    )
                     .clicked()
                 {
                     action = FilesAction::StartHost;
@@ -167,7 +172,15 @@ pub fn show(ui: &mut egui::Ui, state: &mut FilesViewState, mixnet_connected: boo
                 && !state.join_address.is_empty()
                 && !state.join_key.is_empty();
             if ui
-                .add_enabled(can, egui::Button::new("Receive File").fill(theme::PRIMARY))
+                .add_enabled(
+                    can,
+                    egui::Button::new(
+                        egui::RichText::new("Receive File")
+                            .color(theme::ON_PRIMARY)
+                            .strong(),
+                    )
+                    .fill(theme::primary_fill(ui)),
+                )
                 .clicked()
             {
                 action = FilesAction::StartReceive;
