@@ -10,6 +10,10 @@ Secure Passage is a desktop privacy app for **encrypted chat** and **file sharin
 
 Traffic is Sphinx-encrypted and routed through mix nodes for network-level privacy. Application payloads are additionally protected with **AES-256-GCM** session keys that you share out-of-band (copy / QR).
 
+<p align="center">
+  <img src="assets/screenshots/connect-nym.png" alt="Connect to Nym screen" width="720" />
+</p>
+
 ---
 
 ## Table of contents
@@ -42,16 +46,15 @@ Traffic is Sphinx-encrypted and routed through mix nodes for network-level priva
 
 ### UI
 
-- Dark theme (`#333333` / `#3A3A3A`) with purple accent (`#A68CFF`)
+- Dark theme (`#333333` / `#3A3A3A`) with mint-green accent (`#07FF94`)
 - Monospace typography (IBM Plex Mono–style look)
 - Ship banner artwork carried over from the Python app
-- Navigation: File Sharing · Website Hosting · Secure Chat · Mixnet Browser  
-  *(Hosting and Browser are placeholders for a later phase)*
+- Navigation: File Sharing · Website Hosting (in dev) · Secure Chat · Nym Browser (in dev)
 
 ### Deferred
 
 - **Website Hosting** — anonymous static hosting via the mixnet
-- **Mixnet Browser** — SOCKS / IPR browsing with an embedded webview
+- **Nym Browser** — SOCKS / IPR browsing with an embedded webview
 
 ---
 
@@ -116,7 +119,13 @@ Your Nym address stays stable across restarts until you delete that directory.
 2. **Connect to Nym** — wait for gateway bootstrap (can take a minute)  
 3. **Enter App**
 
+While connecting, the embedded Nym client logs gateway bootstrap steps (also available from the in-app **Logs** window):
+
+![Nym connect logs](assets/screenshots/nym-connect-logs.png)
+
 ### Secure Chat
+
+![Secure Chat](assets/screenshots/secure-chat.png)
 
 **Host**
 
@@ -133,6 +142,8 @@ Your Nym address stays stable across restarts until you delete that directory.
 Share address and key through a **separate secure channel**.
 
 ### File Sharing
+
+![File Sharing](assets/screenshots/file-sharing.png)
 
 **Send**
 
@@ -200,7 +211,9 @@ Secure-Passage/
 ├── Cargo.toml                 # workspace
 ├── LICENSE                    # MIT
 ├── README.md
-├── assets/images/             # banner SVG + app icons
+├── assets/
+│   ├── images/                # banner SVG + app icons
+│   └── screenshots/           # README UI screenshots
 ├── crates/
 │   ├── secure-passage-core/   # nym, crypto, protocols (no GUI)
 │   └── secure-passage-ui/     # egui desktop binary
@@ -216,7 +229,7 @@ Secure-Passage/
 - [x] Encrypted chat over MixnetStream  
 - [x] Encrypted file transfer  
 - [ ] Website hosting via mixnet  
-- [ ] Mixnet browser (SOCKS / IPR + webview)  
+- [ ] Nym Browser (SOCKS / IPR + webview)  
 - [ ] Packaging (AppImage / Flatpak / installers)  
 
 ---
